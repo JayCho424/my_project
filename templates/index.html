@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Title -->
+    <title>LLL : Lucky Luxury Lotto</title>
+
+    <!-- Required meta tags -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+          integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+
+    <!-- JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+
+    <!-- 구글폰트 -->
+    <link href="https://fonts.googleapis.com/css?family=Stylish&display=swap" rel="stylesheet">
+
+
+
+    <style>
+        #number-card {
+            font-size: 40pt;
+            width : 80pt;
+            height: 80pt;
+            border-radius : 100pt;
+            padding-top : 15pt;
+        }
+    </style>
+
+    <script>
+        // index.html 로드가 완료되면 자동으로 showStar() 함수를 호출합니다.
+        $(document).ready(function () {
+
+            $("#star-box").html("");
+            lotto_recent();
+        });
+        function lotto_recent() {
+            $.ajax({
+                type: "GET",
+                url: "/recent",
+                data: {'page_give': 'index.html'},
+                success: function (response) {
+                    console.log(response)
+                }
+            })
+        }
+
+        function lotto_lucky() {
+            $.ajax({
+                type: "GET",
+                url: "/lucky",
+                data: {'page_give': 'lucky'},
+                success: function (response) {
+                    console.log(response)
+                }
+            })
+        }
+
+        function lotto_luxury() {
+            $.ajax({
+                type: "GET",
+                url: "/luxury",
+                data: {'page_give': 'luxury'},
+                success: function (response) {
+                    console.log(response)
+                }
+            })
+        }
+
+    </script>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-light bg-light" style = "font-size = 30pt">
+    <a class="navbar-brand" href="#">LLL</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="#" onclick="lotto_recent()">Lotto<span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" onclick="lotto_lucky()">Lucky</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true" onclick="lotto_luxury()">Luxury</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Menu2</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Menu3</a>
+            </li>
+        </ul>
+        <form class="form-inline my-2 my-lg-0">
+            <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+        </form>
+    </div>
+</nav>
+<div class="contents">
+    <div class="sub-contets" style="text-align: center; padding-top : 40pt">
+        <h1><span class="badge badge-light">이번 주 000회 당첨 번호!</span></h1>
+        <div class="number-box" style = "margin : 10pt auto; width : 500pt">
+            <span class="badge badge-primary" id="number-card">5</span>
+            <span class="badge badge-success" id="number-card">23</span>
+            <span class="badge badge-danger" id="number-card">44</span>
+            <span class="badge badge-warning" id="number-card">32</span>
+            <span class="badge badge-info" id="number-card">8</span>
+            <span class="badge badge-dark" id="number-card">27</span>
+        </div>
+    </div>
+
+    <div class="sub-contents" id="table" style="text-align : center; padding-top: 40pt;">
+        <h1><span class="badge badge-light">이 주의 통계!</span></h1>
+        <table class="table" style = "margin: 10pt auto; width : 700pt; ">
+            <thead>
+            <tr>
+                <th scope="col">rank</th>
+                <th scope="col">최대 빈도 수</th>
+                <th scope="col">최소 빈도 수</th>
+                <th scope="col">최근 10회 최대</th>
+                <th scope="col">최근 10회 최소</th>
+            </tr>
+            </thead>
+            <tbody id="selected-number">
+            <tr>
+                <td style ="font-weight: bold">1</td>
+                <td>1</td>
+                <td>13</td>
+                <td>15</td>
+                <td>24</td>
+            </tr>
+            <tr>
+                <td style ="font-weight: bold">2</td>
+                <td>4</td>
+                <td>13</td>
+                <td>16</td>
+                <td>29</td>
+            </tr>
+            <tr>
+                <td style ="font-weight: bold">3</td>
+                <td>19</td>
+                <td>13</td>
+                <td>18</td>
+                <td>34</td>
+            </tr>
+
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+
+</body>
+</html>

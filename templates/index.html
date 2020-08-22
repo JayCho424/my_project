@@ -23,42 +23,179 @@
     <link href="https://fonts.googleapis.com/css?family=Stylish&display=swap" rel="stylesheet">
 
 
-
     <style>
-        #number-card {
+        #number-main {
             font-size: 40pt;
-            width : 80pt;
+            width: 80pt;
             height: 80pt;
-            border-radius : 100pt;
-            padding-top : 15pt;
+            border-radius: 100pt;
+            padding-top: 15pt;
+        }
+
+        #number-sub {
+            font-size: 20pt;
+            width: 40pt;
+            height: 40pt;
+            border-radius: 100pt;
+            padding-top: 10pt;
         }
     </style>
 
     <script>
         // index.html 로드가 완료되면 자동으로 showStar() 함수를 호출합니다.
         $(document).ready(function () {
-
-            $("#star-box").html("");
             lotto_recent();
         });
+
+        function ballColor(num) {
+            let ball_class = '';
+            if (num < 10) {
+                ball_class = 'warning';
+            } else if (num >= 10 && num < 20) {
+                ball_class = 'primary';
+            } else if (num >= 20 && num < 30) {
+                ball_class = 'danger';
+            } else if (num >= 30 && num < 40) {
+                ball_class = 'dark';
+            } else {
+                ball_class = 'success';
+            }
+            return ball_class
+        }
+
+        function makeNumBall(num) {
+            let ball_class = ballColor(num)
+            let tempHtml = `<span class="badge badge-${ball_class}" id="number-main">${num}</span>
+                            `
+            return tempHtml
+        }
+
+        function makeTable_6ball_set(drwNo, drwNo1, drwNo2, drwNo3, drwNo4, drwNo5, drwNo6) {
+            let tempHtml = `<tr>
+                <td style="font-weight: bold">${drwNo}</td>
+                <td><span class="badge badge-${ballColor(drwNo1)}" id="number-sub">${drwNo1}</span></td>
+                <td><span class="badge badge-${ballColor(drwNo2)}" id="number-sub">${drwNo2}</span></td>
+                <td><span class="badge badge-${ballColor(drwNo3)}" id="number-sub">${drwNo3}</span></td>
+                <td><span class="badge badge-${ballColor(drwNo4)}" id="number-sub">${drwNo4}</span></td>
+                <td><span class="badge badge-${ballColor(drwNo5)}" id="number-sub">${drwNo5}</span></td>
+                <td><span class="badge badge-${ballColor(drwNo6)}" id="number-sub">${drwNo6}</span></td>
+            </tr>`
+            return tempHtml
+        }
+
+        function makeTable_count(Num, Count) {
+            let tempHtml = `<td><span class="badge badge-${ballColor(Num)}" id="number-sub">${Num}</span>${Count}</td>`
+            return tempHtml
+        }
+
         function lotto_recent() {
             $.ajax({
                 type: "GET",
                 url: "/recent",
-                data: {'page_give': 'index.html'},
+                data: {},
                 success: function (response) {
-                    console.log(response)
+                    //console.log(response)
+                    if (response['result'] == 'success') {
+                        console.log(response)
+                        // ************Update Recent Number Balls************
+                        $("#6_ball").html("");
+                        $("#6_ball").append(`<h1><span class="badge badge-light">이번 주 ${response['No']}회 당첨 번호!</span></h1>
+                                            <div class="sub-2-contents" id="6_balls" style="margin : 10pt auto; width : 600pt">
+                                            </div>`)
+                        let recent_nums = response['6Nums']
+                        //console.log(recent_nums)
+                        for (let i = 0; i < recent_nums.length; i++) {
+                            //console.log(recent_nums[i])
+                            let tempHtml = makeNumBall(recent_nums[i])
+                            $("#6_balls").append(tempHtml)
+                        }
+
+                        //************Update Recent Table************
+                        $("#table").html("");
+                        $("#table").append(` <h1><span class="badge badge-light">회차별 정보</span></h1>
+                                             <table class="table" style="margin: 10pt auto; width : 700pt; ">
+                                            <thead>
+                                            <tr>
+                                                <th scope="col">회차</th>
+                                                <th scope="col">No1</th>
+                                                <th scope="col">No2</th>
+                                                <th scope="col">No3</th>
+                                                <th scope="col">No4</th>
+                                                <th scope="col">No5</th>
+                                                <th scope="col">No6</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody id="table-number">
+                                            </tbody>
+                                            </table>`)
+                        let recent_list = response['list']
+                        for (let i = 0; i < recent_list.length; i++) {
+                            let drwNo = recent_list[i]['drwNo']
+                            let drwNo1 = recent_list[i]['drwtNo1']
+                            let drwNo2 = recent_list[i]['drwtNo2']
+                            let drwNo3 = recent_list[i]['drwtNo3']
+                            let drwNo4 = recent_list[i]['drwtNo4']
+                            let drwNo5 = recent_list[i]['drwtNo5']
+                            let drwNo6 = recent_list[i]['drwtNo6']
+                            let tempHtml = makeTable_6ball_set(drwNo, drwNo1, drwNo2, drwNo3, drwNo4, drwNo5, drwNo6)
+                            $("#table-number").append(tempHtml)
+                        }
+                    }
                 }
             })
         }
 
-        function lotto_lucky() {
+        function lotto_lucky(){
             $.ajax({
                 type: "GET",
                 url: "/lucky",
-                data: {'page_give': 'lucky'},
+                data: {},
                 success: function (response) {
                     console.log(response)
+                    if (response['result'] == 'success'){
+                        $("#6_ball").html("");
+                        // ********아무렇게나 6 ball 출력************
+                        $("#6_ball").append(`<h1><span class="badge badge-light">행운의 숫자!</span></h1>
+                                            <div class="sub-2-contents" id="6_balls_Rand" style="margin : 10pt auto; width : 500pt">
+                                            </div>`)
+                        let rand_nums = response['rand_nums']
+                        console.log(rand_nums)
+                        for (let i = 0; i < rand_nums.length; i++) {
+                            //console.log(recent_nums[i])
+                            let tempHtml = makeNumBall(rand_nums[i])
+                            $("#6_balls_Rand").append(tempHtml)
+                        }
+                        //************Table 에 뽑은 숫자 append ************
+                        $("#table").html("");
+                        $("#table").append(` <h1><span class="badge badge-light">Selected Numbers</span></h1>
+                                             <table class="table" style="margin: 10pt auto; width : 700pt; ">
+                                            <thead>
+                                            <tr>
+                                                <th scope="col">Trial</th>
+                                                <th scope="col">No1</th>
+                                                <th scope="col">No2</th>
+                                                <th scope="col">No3</th>
+                                                <th scope="col">No4</th>
+                                                <th scope="col">No5</th>
+                                                <th scope="col">No6</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody id="table-number">
+                                            </tbody>
+                                            </table>`)
+                        let random_list = response['rand_list']
+                        for (i = 0; i < random_list.length; i++){
+                            let drwNo = i + 1
+                            let drwNo1 = random_list[i]['No1']
+                            let drwNo2 = random_list[i]['No2']
+                            let drwNo3 = random_list[i]['No3']
+                            let drwNo4 = random_list[i]['No4']
+                            let drwNo5 = random_list[i]['No5']
+                            let drwNo6 = random_list[i]['No6']
+                            let tempHtml = makeTable_6ball_set(drwNo, drwNo1, drwNo2, drwNo3, drwNo4, drwNo5, drwNo6)
+                            $("#table-number").append(tempHtml)
+                        }
+                    }
                 }
             })
         }
@@ -67,17 +204,68 @@
             $.ajax({
                 type: "GET",
                 url: "/luxury",
-                data: {'page_give': 'luxury'},
+                data: {},
                 success: function (response) {
-                    console.log(response)
+                    if (response['result'] == 'success') {
+                        console.log(response)
+                        $("#6_ball").html("");
+                        // ********Max 출연횟수 ball 출력************
+                        $("#6_ball").append(`<h1><span class="badge badge-light">Top 6 : 최대 출현 번호</span></h1>
+                                            <div class="sub-2-contents" id="6_balls_Max" style="margin : 10pt auto; width : 500pt">
+                                            </div>`)
+                        let max_nums = response['Max']
+                        console.log(max_nums)
+                        for (let i = 0; i < max_nums.length; i++) {
+                            //console.log(recent_nums[i])
+                            let tempHtml = makeNumBall(max_nums[i]['Num'])
+                            $("#6_balls_Max").append(tempHtml)
+                        }
+                        // ************Min 출연횟수 ball 출력************
+                        $("#6_ball").append(`<h1><span class="badge badge-light">Top 6 : 최소 출현 번호</span></h1>
+                                            <div class="sub-2-contents" id="6_balls_Min" style="margin : 10pt auto; width : 500pt">
+                                            </div>`)
+                        let min_nums = response['Min']
+                        console.log(min_nums)
+                        for (let i = 0; i < min_nums.length; i++) {
+                            //console.log(recent_nums[i])
+                            let tempHtml = makeNumBall(min_nums[i]['Num'])
+                            $("#6_balls_Min").append(tempHtml)
+                        }
+                        // ************숫자별 출연횟수 Ball & count 출력************
+                        $("#table").html("");
+                        $("#table").append(`<h1><span class="badge badge-light">출연 횟수</span></h1>
+                                            <table class="table" style="margin: 10pt auto; width : 700pt; ">
+                                                <thead>
+
+                                                </thead>
+                                                <tbody id="table-number">
+                                                </tbody>
+                                            </table>`)
+                        let count_list = response['Count_list']
+                        for (let i = 0; i < count_list.length; i++) {
+                            if (i == 0) {
+                                $("#table-number").append(`<tr>
+                                                           <td><span class="badge badge-warning" id="number-sub"></span></td>`)
+                            }
+                            else if (i % 10 == 9){
+                                $("#table-number").append(`</tr>
+                                                            <tr>`)
+                            }
+                            let tempHtml = makeTable_count(count_list[i]['Num'], count_list[i]['Count'])
+                            $("#table-number").append(tempHtml)
+                            if(i == 44) {
+                                $("#table-number").append(`</tr>`)
+                            }
+                        }
+                    }
                 }
-            })
+        })
         }
 
     </script>
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-light bg-light" style = "font-size = 30pt">
+<nav class="navbar navbar-expand-lg navbar-light bg-light" style="font-size = 30pt">
     <a class="navbar-brand" href="#">LLL</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
             aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -93,7 +281,7 @@
                 <a class="nav-link" href="#" onclick="lotto_lucky()">Lucky</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true" onclick="lotto_luxury()">Luxury</a>
+                <a class="nav-link" href="#" onclick="lotto_luxury()">Luxury</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Menu2</a>
@@ -109,53 +297,42 @@
     </div>
 </nav>
 <div class="contents">
-    <div class="sub-contets" style="text-align: center; padding-top : 40pt">
+    <div class="sub-contets" id='6_ball' style="text-align: center; padding-top : 40pt">
         <h1><span class="badge badge-light">이번 주 000회 당첨 번호!</span></h1>
-        <div class="number-box" style = "margin : 10pt auto; width : 500pt">
-            <span class="badge badge-primary" id="number-card">5</span>
-            <span class="badge badge-success" id="number-card">23</span>
-            <span class="badge badge-danger" id="number-card">44</span>
-            <span class="badge badge-warning" id="number-card">32</span>
-            <span class="badge badge-info" id="number-card">8</span>
-            <span class="badge badge-dark" id="number-card">27</span>
+        <div class="sub-2-contents" id="6_balls" style="margin : 10pt auto; width : 500pt">
+            <span class="badge badge-primary" id="number-main">5</span>
+            <span class="badge badge-success" id="number-main">23</span>
+            <span class="badge badge-danger" id="number-main">44</span>
+            <span class="badge badge-warning" id="number-main">32</span>
+            <span class="badge badge-info" id="number-main">8</span>
+            <span class="badge badge-dark" id="number-main">27</span>
         </div>
     </div>
 
     <div class="sub-contents" id="table" style="text-align : center; padding-top: 40pt;">
-        <h1><span class="badge badge-light">이 주의 통계!</span></h1>
-        <table class="table" style = "margin: 10pt auto; width : 700pt; ">
+        <h1><span class="badge badge-light">회차별 정보</span></h1>
+        <table class="table" style="margin: 10pt auto; width : 700pt; ">
             <thead>
             <tr>
-                <th scope="col">rank</th>
-                <th scope="col">최대 빈도 수</th>
-                <th scope="col">최소 빈도 수</th>
-                <th scope="col">최근 10회 최대</th>
-                <th scope="col">최근 10회 최소</th>
+                <th scope="col">회차</th>
+                <th scope="col">No1</th>
+                <th scope="col">No2</th>
+                <th scope="col">No3</th>
+                <th scope="col">No4</th>
+                <th scope="col">No5</th>
+                <th scope="col">No6</th>
             </tr>
             </thead>
-            <tbody id="selected-number">
+            <tbody id="table-number">
             <tr>
-                <td style ="font-weight: bold">1</td>
-                <td>1</td>
-                <td>13</td>
-                <td>15</td>
-                <td>24</td>
+                <td style="font-weight: bold">1</td>
+                <td><span class="badge badge-primary" id="number-sub">5</span></td>
+                <td><span class="badge badge-primary" id="number-sub">13</span></td>
+                <td><span class="badge badge-primary" id="number-sub">15</span></td>
+                <td><span class="badge badge-primary" id="number-sub">24</span></td>
+                <td><span class="badge badge-primary" id="number-sub">33</span></td>
+                <td><span class="badge badge-primary" id="number-sub">44</span></td>
             </tr>
-            <tr>
-                <td style ="font-weight: bold">2</td>
-                <td>4</td>
-                <td>13</td>
-                <td>16</td>
-                <td>29</td>
-            </tr>
-            <tr>
-                <td style ="font-weight: bold">3</td>
-                <td>19</td>
-                <td>13</td>
-                <td>18</td>
-                <td>34</td>
-            </tr>
-
             </tbody>
         </table>
     </div>
